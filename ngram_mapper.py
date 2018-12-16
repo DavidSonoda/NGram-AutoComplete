@@ -39,6 +39,8 @@ def map_n_gram(arr, n):
     for i in range(0, end):
         for j in range(i, end):
             key = concat_arr(arr[i:j+1])
+            if not is_valid_key(key):
+                continue
             value = concat_arr(arr[j+1:j+6])
             if brackets_closed(value):
                 print(key + '\t' + value)
@@ -63,6 +65,16 @@ def brackets_closed(str):
     b_opening = set(brackets["opening"])
     b_closing = set(brackets["closing"])
 
+    if len(b_opening) != len(b_closing):
+        print('Brackets config not valid, please check config.py')
+        return
+
+    b_open_m = {}
+    b_close_m = {}
+    for i in range(0, len(b_opening)):
+        b_open_m[brackets['opening'][i]] = i
+        b_close_m[brackets['closing'][i]] = i
+
     b_stack = []
     for c in str:
         if c in b_opening:
@@ -70,13 +82,21 @@ def brackets_closed(str):
         if c in b_closing:
             if len(b_stack) == 0:
                 return False
-            if c != b_stack[0]:
+            elif b_close_m[c] != b_open_m[b_stack[0]]:
                 return False
-            else:
+            elif b_close_m[c] == b_open_m[b_stack[0]]:
                 b_stack.pop()
 
     return len(b_stack) == 0
 
+def is_chn_char(c):
+    return c >= u'\u4e00' and c <= u'\u9fff'
+
+def is_valid_key(key):
+    for c in key:
+        if is_chn_char(c):
+            return True
+    return False
 
 if __name__ == "__main__":
     main()
