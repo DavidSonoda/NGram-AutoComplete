@@ -13,25 +13,29 @@ def main():
     parser.add_argument('--file', help='csv file that you want to convert', required=True)
     parser.add_argument('--gram_num', required=True,
                         help='Source file encoding')
+    parser.add_argument('--local', help='local mode', default=True)
 
     args = parser.parse_args()
     gram_num = args.gram_num
 
-
-    print(args.file)
+    local_mode = args.local
+    mapped = open('mapped_gram' + gram_num + '.csv', "w")
+    # print(args.file)
     with open(args.file) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             seg_list = list(jb.cut(row[0]))
             # print(seg_list)
-            map_n_gram(seg_list, gram_num)
+            map_n_gram(seg_list, gram_num, local_mode, mapped)
 
-def map_n_gram(arr, n):
+def map_n_gram(arr, n, local_mode, file):
     """
     Map a list of chinese words to n-gram record.
     :param arr: Array of chinese words separated using jieba
     :param n: N-gram's N
     """
+
+
     length = len(arr)
     end = length - int(n)
     if end <= 0:
@@ -43,7 +47,10 @@ def map_n_gram(arr, n):
                 continue
             value = concat_arr(arr[j+1:j+6])
             if brackets_closed(value):
-                print(key + '\t' + value)
+                if not local_mode:
+                    print(key + '\t' + value + '\t1')
+                else:
+                    file.write(key + '\t' + value + '\t' + '1\n')
 
 
 def concat_arr(arr):
@@ -93,6 +100,11 @@ def is_chn_char(c):
     return c >= u'\u4e00' and c <= u'\u9fff'
 
 def is_valid_key(key):
+    """
+    Determines if a key is valid
+    :param key:
+    :return:
+    """
     for c in key:
         if is_chn_char(c):
             return True
