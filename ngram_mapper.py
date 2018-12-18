@@ -19,7 +19,8 @@ def main():
     gram_num = args.gram_num
 
     local_mode = args.local
-    mapped = open('mapped_gram' + gram_num + '.csv', "w")
+    fn = args.file.split('.')
+    mapped = open(fn[0] + '_stage0_gram' + gram_num + '.' + fn[1], "w")
     # print(args.file)
     with open(args.file) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -45,7 +46,7 @@ def map_n_gram(arr, n, local_mode, file):
             key = concat_arr(arr[i:j+1])
             if not is_valid_key(key):
                 continue
-            value = concat_arr(arr[j+1:j+6])
+            value = concat_arr(arr[j+1:j+1+int(n)])
             if brackets_closed(value):
                 if not local_mode:
                     print(key + '\t' + value + '\t1')
