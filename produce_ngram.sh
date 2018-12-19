@@ -12,7 +12,8 @@ n_gram_process() {
     echo "Second reducing stage..."
     cat video_name_stage1_gram${num}.csv | sort -t '\t' -k1,1 -k3,3n > video_name_stage1_gram${num}_sorted.csv
     python3 ngram_secondary_reducer.py --file video_name.csv --gram_num $num
-    echo "Completing..."
+    echo "Completing...Importing into redis"
+    python3 load_gram.py --file video_name.csv --gram_num $num
     rm -r video_name_stage*
 }
 
